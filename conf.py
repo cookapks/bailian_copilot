@@ -8,12 +8,19 @@ BUTTONS = {"rate": (1087, 694), "draw": (960, 754), "drop": (956, 793),
            "tran": (1000, 413), "tran_back": (993, 467), "home": (1145, 836),
            "center": (960, 760), "ok": (1050, 605), "floor": (1165, 748),
            "reward": (1000, 641), "cancel_ad": (1147, 170), "receive": (1000, 641),
+           "back_home": (815, 878),
+
+           # PK竞技场
            "pk": (1160, 450), "bt_field": (1067, 694), "vs": (1078, 737),
-           "back_pk": (815, 878),
+
+           # 商店
+           "shop": (767, 231), "th_gift": (987, 882), "day_bo": (906, 798),
+           "day_gift": (1098, 465), "week_bo": (1019, 796), "week_gift": (1087, 470),
+           "fuli": (764, 282), "daily_sign": (1136, 878), "get_sign": (964, 788),
+           "act": (1155, 507), "act_hero": (1115, 880), "get_hero": (954, 793),
            }
 # 日常按钮
-DAILY_BUTS = {"SHOP": (767, 231), "GIFT": (987, 882), "DAY_BO": (906, 798),
-              "DAY_GIFT": (1098, 465), "WEEK_BO": (1019, 796), "WEEK_GIFT": (1087, 470)}
+DAILY_BUTS = {}
 
 # 按键颜色
 BUTTONS_COLORS = {"rate": (36, 201, 83), "draw": (690, 960, 754),
@@ -37,7 +44,19 @@ CANCEL_AD = "cancel_ad"
 PK = "pk"
 VS = "vs"
 BT_FIELD = "bt_field"
-BACK_PK = "back_pk"
+BACK_HOME = "back_home"
+SHOP = "shop"
+TH_GIFT = "th_gift"
+DAY_BAO = "day_bo"
+DAY_GIFT = "day_gift"
+WEEK_BAO = "week_bo"
+WEEK_GIFT = "week_gift"
+FULI = "fuli"
+DAILY_SIGN = "daily_sign"
+GET_SIGN = "get_sign"
+ACT = "act"
+ACT_HERO = "act_hero"
+GET_HERO = "get_hero"
 
 # 关卡相关
 MAP_LEVEL_A_BUTTON = {

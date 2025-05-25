@@ -5,6 +5,7 @@
 import pyautogui
 import time
 import random
+from datetime import datetime
 
 from conf import *
 from router import RouterA
@@ -25,7 +26,7 @@ class Base:
         pyautogui.moveTo(x, y, duration=self.duration)  # 用0.5秒时间移动鼠标到目标位置
         # 点击鼠标左键
         if click:
-            print('点击了坐标', x, y)
+            print(f'点击了按钮', x, y)
             for i in range(click_count):
                 pyautogui.click()
                 self.timeout(1.2)
@@ -190,8 +191,8 @@ class DailyTask(Base):
     def __init__(self):
         super().__init__()
         self.duration = 0.2  # 鼠标移动间隙速度
-        self.box_limit = 15  # 每日箱子最大领取次数
-        self.pk_limit = 2  # 每日免费战斗次数
+        self.box_limit = 30  # 每日箱子最大领取次数
+        self.pk_limit = 4  # 每日免费战斗次数
         # 首先确保自己自己在主城
         # self.click_back_home()
 
@@ -211,8 +212,6 @@ class DailyTask(Base):
 
     def click_battle(self):
         # PK竞技场 每日4次
-        # 首先确保自己自己在主城
-        # self.click_back_home()
 
         self.click(PK, sec=5)   # 第一次加载比较慢
         self.click(BT_FIELD)
@@ -221,7 +220,7 @@ class DailyTask(Base):
             self.click(VS, sec=12)
             self.click(FLOOR, sec=3)
             self.pk_limit -= 1
-        self.click(BACK_PK, sec=3)
+        self.click(BACK_HOME, sec=2)
 
     def rush_quick(self):
         # 快速拿箱子，刷8-2 F4
@@ -248,6 +247,33 @@ class DailyTask(Base):
             self.click(FLOOR)
         self.box_limit -= 1
 
+    def click_shop(self):
+
+        self.click(SHOP)    # 点击商店
+        self.click(TH_GIFT)  # 点击特惠礼包
+        self.click(DAY_BAO)  # 点击每日礼包
+        self.click(DAY_GIFT)  # 点击免费领取
+        if not self.check_monday():  # 周一执行
+            self.click(WEEK_BAO)  # 点击每周礼包
+            # self.click(WEEK_GIFT)  # 点击免费领取
+        self.click(BACK_HOME, sec=2)  # 点击退出
+
+    def click_sign(self):
+        self.click(FULI)    # 点击福利
+        self.click(DAILY_SIGN)    # 点击福利
+        self.click(GET_SIGN)    # 点击福利
+        self.click(BACK_HOME, sec=2)    # 点击福利
+
+    def click_hero_card(self):
+        self.click(ACT)  # 点击福利
+        self.click(ACT_HERO)  # 点击福利
+        self.click(GET_HERO)  # 点击福利
+        self.click(BACK_HOME, sec=2)  # 点击福利
+
+    @staticmethod
+    def check_monday():
+        return datetime.now().weekday()
+
 
 if __name__ == '__main__':
     # 抽卡
@@ -258,7 +284,8 @@ if __name__ == '__main__':
 
     # 刷日常
     # DailyTask().rush_quick()
-    DailyTask().click_battle()
+    # DailyTask().click_battle()
+    DailyTask().click_hero_card()
 
 
 
