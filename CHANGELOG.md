@@ -10,6 +10,17 @@ This game script was developed to free my hands. Mainly for self-learning purpos
 
 ###  What's News
 
+2025-05-26
+\- [docs]\(001\): Added some project descriptions
+
+2025-05-25
+\- [improve]\(001\): improved some daily task codes
+
+it's contained: 
+1. Daily Shopping Gift Pack
+2. Daily Hero Gift
+3. Daily check-in
+
 2025-05-24
 
 \- [feat]\(001\): upload my project
@@ -20,10 +31,6 @@ it's contained:
 2. Automatic card drawing.
 3. Automatic wood brushing (5-2 levels).
 
-2025-05-25
-\- [improve]\(001\): improved some daily task codes
 
-it's contained: 
-1. Daily Shopping Gift Pack
-2. Daily Hero Gift
-3. Daily check-in
+
+

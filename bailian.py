@@ -8,7 +8,7 @@ import random
 from datetime import datetime
 
 from conf import *
-from router import RouterA
+from src.router import RouterA
 
 
 class Base:
@@ -158,7 +158,7 @@ class DrawCard(Base):
 
 
 class AutoFight(Base, RouterA):
-    """争队特定关卡进行自动刷怪"""
+    """指定特定关卡进行自动路线清本"""
 
     def __init__(self):
         super().__init__()
@@ -283,9 +283,10 @@ if __name__ == '__main__':
     # AutoFight().rush_wood()
 
     # 刷日常
+    DailyTask().rush_all()
     # DailyTask().rush_quick()
     # DailyTask().click_battle()
-    DailyTask().click_hero_card()
+    # DailyTask().click_hero_card()
 
 
 
