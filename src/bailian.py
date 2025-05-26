@@ -283,8 +283,8 @@ if __name__ == '__main__':
     # AutoFight().rush_wood()
 
     # 刷日常
-    DailyTask().rush_all()
-    # DailyTask().rush_quick()
+    # DailyTask().rush_all()
+    DailyTask().rush_quick()
     # DailyTask().click_battle()
     # DailyTask().click_hero_card()
 
