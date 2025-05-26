@@ -11,7 +11,7 @@ This game script was developed to free my hands. Mainly for self-learning purpos
 ###  What's News
 
 2025-05-26
-\- [docs]\(001\): Added some project descriptions
+\- [docs]\(001\): Added some project descriptions, and adjusted the project structure
 
 2025-05-25
 \- [improve]\(001\): improved some daily task codes

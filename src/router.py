@@ -1,9 +1,4 @@
-import pyautogui
-import time
-import random
 from abc import ABC, abstractmethod
-
-from conf import *
 
 
 class Router(ABC):
