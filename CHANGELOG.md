@@ -1,13 +1,5 @@
 ChangeLog
-
-
-
-## description:
-
-This game script was developed to free my hands. Mainly for self-learning purposes, without any commercial use.
-
-* Resolution support 1920 * 1080
-
+\
 ###  What's News
 
 2025-05-28
