@@ -194,7 +194,7 @@ class DailyTask(Base):
         self.box_limit = 30  # 每日箱子最大领取次数
         self.pk_limit = 4  # 每日免费战斗次数
         # 首先确保自己自己在主城
-        # self.click_back_home()
+        self.click_back_home()
 
     def rush_all(self):
         # 点掉初始的各种活动弹窗, 点个什么五六次
