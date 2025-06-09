@@ -1,6 +1,7 @@
 """
 百炼英雄小程序游戏辅助脚本
 """
+from math import sqrt
 
 import pyautogui
 import time
@@ -8,6 +9,7 @@ import random
 from datetime import datetime
 
 from conf import *
+from card_conf import *
 from src.router import RouterA
 
 
@@ -90,6 +92,7 @@ class DrawCard(Base):
         super().__init__()
         # 初始化抽卡状态存储
         self.card_pos_color = {"A": "", "B": "", "C": ""}
+        self.card_total_count = 3
         self.card_color = list()
         self.card_status = {"A": False, "B": False, "C": False}
 
@@ -116,6 +119,66 @@ class DrawCard(Base):
         if any(list(self.card_status.values())):
             return 0
         return 1
+
+    @staticmethod
+    def rgb_similarity(rgb1, rgb2, threshold=0.97):
+        """
+        计算两个RGB颜色的相似度，并与阈值比较
+
+        参数:
+        rgb1 -- 第一个RGB颜色，格式为元组 (R, G, B)
+        rgb2 -- 第二个RGB颜色，格式为元组 (R, G, B)
+        threshold -- 相似度阈值(0-1)，低于此值返回False
+
+        返回:
+        bool -- 如果相似度 >= 阈值返回True，否则返回False
+        """
+        # 计算欧几里得距离
+        distance = sqrt(sum((c1 - c2) ** 2 for c1, c2 in zip(rgb1, rgb2)))
+
+        # 最大可能的RGB距离(黑色到白色)
+        max_distance = sqrt(3 * (255 ** 2))
+
+        # 将距离转换为相似度(0-1)
+        similarity = 1 - (distance / max_distance)
+
+        return similarity > threshold
+
+    def check_card_role_A(self):
+        """根据固定值判定角色为哪个卡，
+        优点：速度快
+        缺点：存在人为校准问题，如RGB偏差， 会导致报错"""
+
+        res = ['', '', '']
+        for i in range(self.card_total_count):
+            for role, points in CARD_KEY_POINT.items():
+                if points[i]:
+                    if ROLE_KEY_RGB.get(pyautogui.pixel(*points[i])) == role:
+                        res[i] = role
+
+        print(res)
+
+    def check_card_role_B(self):
+        """根据阈值范围模糊判定角色为哪个卡
+        优点：准确
+        缺点：性能差, 可能识别错"""
+
+        res = ['', '', '']
+        for i in range(self.card_total_count):
+            color = self.card_color[i]
+            for role, points in eval(f'CARD_KEY_POINT_{color.upper()}').items():
+                if points[i]:
+                    role_rgb = eval(f'ROLE_KEY_RGB_{color.upper()}')
+                    for rgb in list(role_rgb.keys()):
+                        if self.rgb_similarity(pyautogui.pixel(*points[i]), rgb):
+                            print(i, role_rgb[rgb], pyautogui.pixel(*points[i]), rgb)
+                            print(points[i], role_rgb[rgb])
+                            res[i] = role_rgb[rgb]
+                            break
+                    if res[i]:
+                        break
+
+        print(res)
 
     def click_drop(self, sec=4):
         self.move_mouse(*BUTTONS['drop'], click=True)
@@ -278,13 +341,17 @@ class DailyTask(Base):
 if __name__ == '__main__':
     # 抽卡
     # DrawCard().run()
+    dc = DrawCard()
+    dc.check_card_color()
+    # dc.check_card_role_A()
+    dc.check_card_role_B()
 
     # 刷木头
     # AutoFight().rush_wood()
 
     # 刷日常
     # DailyTask().rush_all()
-    DailyTask().rush_quick()
+    # DailyTask().rush_quick()
     # DailyTask().click_battle()
     # DailyTask().click_hero_card()
 
