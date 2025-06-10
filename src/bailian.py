@@ -1,6 +1,7 @@
 """
 百炼英雄小程序游戏辅助脚本
 """
+from math import sqrt
 
 import pyautogui
 import time
@@ -8,7 +9,9 @@ import random
 from datetime import datetime
 
 from conf import *
+from card_conf import *
 from src.router import RouterA
+from src.enums import CardMap
 
 
 class Base:
@@ -26,7 +29,7 @@ class Base:
         pyautogui.moveTo(x, y, duration=self.duration)  # 用0.5秒时间移动鼠标到目标位置
         # 点击鼠标左键
         if click:
-            print(f'点击了按钮', x, y)
+            # print(f'点击了按钮', x, y)
             for i in range(click_count):
                 pyautogui.click()
                 self.timeout(1.2)
@@ -90,8 +93,13 @@ class DrawCard(Base):
         super().__init__()
         # 初始化抽卡状态存储
         self.card_pos_color = {"A": "", "B": "", "C": ""}
+        self.card_role = {"A": "", "B": "", "C": ""}
+        self.card_role_rev = {}
+        self.card_total_count = 3
         self.card_color = list()
         self.card_status = {"A": False, "B": False, "C": False}
+        self.card_draw_times = {"A": 0, "B": 0, "C": 0}
+
 
         # 统计
         self.count = 0
@@ -117,6 +125,51 @@ class DrawCard(Base):
             return 0
         return 1
 
+    @staticmethod
+    def rgb_similarity(rgb1, rgb2, threshold=0.97):
+        """
+        计算两个RGB颜色的相似度，并与阈值比较
+
+        参数:
+        rgb1 -- 第一个RGB颜色，格式为元组 (R, G, B)
+        rgb2 -- 第二个RGB颜色，格式为元组 (R, G, B)
+        threshold -- 相似度阈值(0-1)，低于此值返回False
+
+        返回:
+        bool -- 如果相似度 >= 阈值返回True，否则返回False
+        """
+        # 计算欧几里得距离
+        distance = sqrt(sum((c1 - c2) ** 2 for c1, c2 in zip(rgb1, rgb2)))
+
+        # 最大可能的RGB距离(黑色到白色)
+        max_distance = sqrt(3 * (255 ** 2))
+
+        # 将距离转换为相似度(0-1)
+        similarity = 1 - (distance / max_distance)
+
+        return similarity > threshold
+
+    def check_card_role(self):
+        """根据阈值范围模糊判定角色为哪个卡
+        优点：准确
+        缺点：性能差, 可能识别错"""
+
+        for i in range(self.card_total_count):
+            color = self.card_color[i]
+            for role, points in eval(f'CARD_KEY_POINT_{color.upper()}').items():
+                if points[i]:
+                    role_rgb = eval(f'ROLE_KEY_RGB_{color.upper()}')
+                    for rgb in list(role_rgb.keys()):
+                        if self.rgb_similarity(pyautogui.pixel(*points[i]), rgb):
+                            # print(i, role_rgb[rgb], pyautogui.pixel(*points[i]), rgb)
+                            # print(points[i], role_rgb[rgb])
+                            self.card_role[CARD_LIST[i]] = role_rgb[rgb]
+                            break
+                    if self.card_role[CARD_LIST[i]]:
+                        break
+        self.card_role_rev = {v: k for k, v in self.card_role.items()}
+        print(f'本次三张卡角色分别为: {self.card_role}')
+
     def click_drop(self, sec=4):
         self.move_mouse(*BUTTONS['drop'], click=True)
         # 统计抽到的卡数
@@ -133,12 +186,41 @@ class DrawCard(Base):
         else:
             print(f'目前是旧的一页待第二次抽卡')
 
+    def load_diamond_set(self):
+        for role in list(self.card_role.values()):
+            if role in ALLOW_ALLIN_ROLE:
+                self.card_draw_times[self.card_role_rev[role]] = ALLOW_ALLIN_ROLE[role]
+
+    def if_continue_draw(self):
+        # todo 需要测试
+        self.refresh_card_status()
+        for card, times in self.card_draw_times.items():
+            if not self.card_status[card]:
+                #  仅当状态为False(说明卡未被抽)且当抽取次数>0的时候需要继续用钻石抽取
+                if times > 0:
+                    self.click(BT_DRAW, sec=4)
+                    # 检测是否钻石不足, 不足直接退出
+                    if pyautogui.pixel(*BUTTONS[FLOOR1]) == BUTTONS_COLORS[FLOOR1]:
+                        self.click(BACK_HOME, sec=2)
+                        return True
+                    self.refresh_card_status()
+                    if not self.card_status[card]:
+                        self.click(BT_DRAW, sec=4)
+                    else:
+                        continue
+                else:
+                    continue
+
     def run(self):
         """主逻辑执行"""
         while True:
             print('')
             # 判断ABC三张卡颜色
             self.check_card_color()
+            # 判断三张卡角色
+            self.check_card_role()
+            # 整理钻石设定
+            self.load_diamond_set()
             # 刷新卡状态
             self.refresh_card_status()
             self.check_new_page()
@@ -150,6 +232,9 @@ class DrawCard(Base):
                     self.click(BT_RATE)
                 self.click(BT_DRAW, sec=4)
                 self.count += 1
+                # 判定是否存在高倍钻石抽取设定，若指定金红卡被抽取，则继续，若未抽取，则继续用钻石抽取
+                if self.if_continue_draw():
+                    self.click_drop()
             else:
                 self.click_drop()
                 print(
@@ -213,7 +298,7 @@ class DailyTask(Base):
     def click_battle(self):
         # PK竞技场 每日4次
 
-        self.click(PK, sec=5)   # 第一次加载比较慢
+        self.click(PK, sec=5)  # 第一次加载比较慢
         self.click(BT_FIELD)
 
         while self.pk_limit:
@@ -229,6 +314,7 @@ class DailyTask(Base):
             self.check_city_load_complete()
             self.click_level(DAILY_LEVEL)
             for num, router in enumerate(F4_ROUTER, start=1):
+                # todo 需要解决1、中断后需检测还可以看几次广告，2、解决报错问题，若报错需要重来
                 self.move(router[0], router[1], sec=1)
                 if num % 2 == 0:
                     time.sleep(4)
@@ -249,7 +335,7 @@ class DailyTask(Base):
 
     def click_shop(self):
 
-        self.click(SHOP)    # 点击商店
+        self.click(SHOP)  # 点击商店
         self.click(TH_GIFT)  # 点击特惠礼包
         self.click(DAY_BAO)  # 点击每日礼包
         self.click(DAY_GIFT)  # 点击免费领取
@@ -259,10 +345,10 @@ class DailyTask(Base):
         self.click(BACK_HOME, sec=2)  # 点击退出
 
     def click_sign(self):
-        self.click(FULI)    # 点击福利
-        self.click(DAILY_SIGN)    # 点击福利
-        self.click(GET_SIGN)    # 点击福利
-        self.click(BACK_HOME, sec=2)    # 点击福利
+        self.click(FULI)  # 点击福利
+        self.click(DAILY_SIGN)  # 点击福利
+        self.click(GET_SIGN)  # 点击福利
+        self.click(BACK_HOME, sec=2)  # 点击福利
 
     def click_hero_card(self):
         self.click(ACT)  # 点击福利
@@ -277,17 +363,16 @@ class DailyTask(Base):
 
 if __name__ == '__main__':
     # 抽卡
-    # DrawCard().run()
+    DrawCard().run()
+    # dc = DrawCard()
+    # dc.check_card_color()
+    # dc.check_card_role()
 
     # 刷木头
     # AutoFight().rush_wood()
 
     # 刷日常
     # DailyTask().rush_all()
-    DailyTask().rush_quick()
+    # DailyTask().rush_quick()
     # DailyTask().click_battle()
     # DailyTask().click_hero_card()
-
-
-
-

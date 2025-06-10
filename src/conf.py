@@ -1,14 +1,11 @@
-# 各卡RGB
-COLOR_POINT = {(170, 165, 157): "white", (41, 140, 211): "blue", (182, 52, 255): "purple",
-               (255, 191, 19): "gold", (217, 31, 54): "red"}
-# 展示卡的坐标
-CARD_SHOW_POS = {"A": (810, 400), "B": (933, 433), "C": (1063, 401)}
+
+
 # 相关按键
 BUTTONS = {"rate": (1087, 694), "draw": (960, 754), "drop": (956, 793),
            "tran": (1000, 413), "tran_back": (993, 467), "home": (1145, 836),
            "center": (960, 760), "ok": (1050, 605), "floor": (1165, 748),
            "reward": (1000, 641), "cancel_ad": (1147, 170), "receive": (1000, 641),
-           "back_home": (815, 878),
+           "back_home": (815, 878), "floor1": (1091, 256),
 
            # PK竞技场
            "pk": (1160, 450), "bt_field": (1067, 694), "vs": (1078, 737),
@@ -25,7 +22,7 @@ DAILY_BUTS = {}
 # 按键颜色
 BUTTONS_COLORS = {"rate": (36, 201, 83), "draw": (690, 960, 754),
                   "tran": (54, 195, 55), "ok": (66, 224, 24),
-                  "reward": (245, 222, 77)}
+                  "reward": (245, 222, 77), "floor1": (50, 101, 150)}
 # 抽到卡后的勾颜色RGB: 66,224,24
 CARD_SHOW_STATUS = {"A": (831, 518), "B": (954, 550), "C": (1083, 518)}
 
@@ -38,6 +35,7 @@ BT_HOME = 'home'
 BT_OK = 'ok'
 CENTER = 'center'
 FLOOR = 'floor'
+FLOOR1 = 'floor1'
 REWARD = 'reward'
 RECEIVE = 'receive'
 CANCEL_AD = "cancel_ad"
