@@ -108,7 +108,7 @@ class DrawCard(Base):
 
     def check_card_color(self):
         for card, pos in CARD_SHOW_POS.items():
-            self.card_pos_color[card] = COLOR_POINT[pyautogui.pixel(*pos)]
+            self.card_pos_color[card] = COLOR_POINT.get(pyautogui.pixel(*pos), "white")
         self.card_color = list(self.card_pos_color.values())
         print(f'本次三张卡颜色分别为: {self.card_color}')
 
@@ -153,7 +153,7 @@ class DrawCard(Base):
         """根据阈值范围模糊判定角色为哪个卡
         优点：准确
         缺点：性能差, 可能识别错"""
-
+        self.card_role = {"A": "", "B": "", "C": ""}
         for i in range(self.card_total_count):
             color = self.card_color[i]
             for role, points in eval(f'CARD_KEY_POINT_{color.upper()}').items():
@@ -161,8 +161,8 @@ class DrawCard(Base):
                     role_rgb = eval(f'ROLE_KEY_RGB_{color.upper()}')
                     for rgb in list(role_rgb.keys()):
                         if self.rgb_similarity(pyautogui.pixel(*points[i]), rgb):
-                            # print(i, role_rgb[rgb], pyautogui.pixel(*points[i]), rgb)
-                            # print(points[i], role_rgb[rgb])
+                            print(i, role_rgb[rgb], pyautogui.pixel(*points[i]), rgb)
+                            print(points[i], role_rgb[rgb])
                             self.card_role[CARD_LIST[i]] = role_rgb[rgb]
                             break
                     if self.card_role[CARD_LIST[i]]:
@@ -239,6 +239,7 @@ class DrawCard(Base):
                 self.click_drop()
                 print(
                     f'目前抽取结果汇总=======>> 抽取次数：{self.count}, 红卡次数：{self.red_count}, 金卡次数：{self.gold_count}')
+            self.check_card_role()
             print('开启循环下一次')
 
 
@@ -363,8 +364,9 @@ class DailyTask(Base):
 
 if __name__ == '__main__':
     # 抽卡
-    DrawCard().run()
-    # dc = DrawCard()
+    dc = DrawCard()
+    dc.run()
+
     # dc.check_card_color()
     # dc.check_card_role()
 
